@@ -18,7 +18,7 @@ permissions:
 concurrency:
   group: "pages"
   cancel-in-progress: false
-  
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -54,7 +54,10 @@ jobs:
 
       - name: Build
         run: npm run build
-        
+      
+      - name: list dist
+        run: ls ./dist
+      
       - name: Cache Dist
         uses: actions/cache/save@v3
         id: cache
@@ -88,6 +91,9 @@ jobs:
           # Upload dist folder
           path: './dist'
         
+      - name: list dist
+        run: ls ./dist
+
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
