@@ -1,5 +1,24 @@
 name: test-project
-on: push
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+  
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -17,3 +36,60 @@ jobs:
 
       - name: Run Tests
         run: npm test 
+  
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.12.1
+    
+      - name: Install Dependencies
+        run: npm ci 
+
+      - name: Build
+        run: npm run build
+        
+      - name: Cache Dist
+        uses: actions/cache/save@v3
+        id: cache
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Restore Cache
+        uses: actions/cache/restore@v3
+        id: cache
+        with:
+          path: ./dist
+          key: ${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+        
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          # Upload dist folder
+          path: './dist'
+        
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+  
+
