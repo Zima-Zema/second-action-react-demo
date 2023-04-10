@@ -55,15 +55,11 @@ jobs:
       - name: Build
         run: npm run build
       
-      - name: list dist
-        run: ls ./dist
-      
-      - name: Cache Dist
-        uses: actions/cache/save@v3
-        id: cache
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v1
         with:
-          path: ./dist
-          key: ${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          # Upload dist folder
+          path: './dist'
   
   deploy:
     runs-on: ubuntu-latest
@@ -75,24 +71,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Restore Cache
-        uses: actions/cache/restore@v3
-        id: cache
-        with:
-          path: ./dist
-          key: ${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
       - name: Setup Pages
         uses: actions/configure-pages@v3
-        
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          # Upload dist folder
-          path: './dist'
-        
-      - name: list dist
-        run: ls ./dist
 
       - name: Deploy to GitHub Pages
         id: deployment
