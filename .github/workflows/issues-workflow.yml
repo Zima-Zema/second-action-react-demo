@@ -1,0 +1,11 @@
+name: project-issues
+on: issues
+
+jobs:
+  issue_details:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print Docker Version
+        run: docker --version
+      - name: OutPut Issue Details
+        run: echo "${{ toJson(github.event) }}"
