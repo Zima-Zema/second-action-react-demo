@@ -26,29 +26,12 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: 'Download artifact'
-        uses: actions/github-script@v6
+      - uses: actions/download-artifact@v3
         with:
-          script: |
-            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               run_id: context.payload.workflow_run.id,
-            });
-            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
-              return artifact.name == "github-pages"
-            })[0];
-            let download = await github.rest.actions.downloadArtifact({
-               owner: context.repo.owner,
-               repo: context.repo.repo,
-               artifact_id: matchArtifact.id,
-               archive_format: 'zip',
-            });
-            let fs = require('fs');
-            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/github-pages.zip`, Buffer.from(download.data));
-
-      - name: 'Unzip artifact'
-        run: unzip github-pages.zip
+          name: artifact.tar
+        
+      - name: Display structure of downloaded files
+        run: ls -R
 
       # - name: Checkout
       #   uses: actions/checkout@v3
