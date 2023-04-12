@@ -28,9 +28,15 @@ jobs:
     steps:
       - uses: actions/download-artifact@v3
         with:
-          name: artifact.tar
+          name: github-pages
+
+      - name: Display structure of before unzip files
+        run: ls -R
+
+      - name: 'Unzip artifact'
+        run: unzip github-pages.zip
         
-      - name: Display structure of downloaded files
+      - name: Display structure of after unzip files
         run: ls -R
 
       # - name: Checkout
