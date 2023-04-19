@@ -71,7 +71,7 @@ jobs:
 
       - name: Publish JS filename
         id: publish_step
-        run: find dist/assets/*.js -type f -execdir echo 'script-file={}' >> $GITHUB_OUTPUT ';'
+        run: find dist/*.js -type f -execdir echo 'script-file={}' >> $GITHUB_OUTPUT ';'
 
       - uses: actions/upload-artifact@v3
         with:
