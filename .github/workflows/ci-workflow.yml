@@ -23,7 +23,7 @@ jobs:
       - name: Install NodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: 18.12.1
+          node-version: 18.15.0
       
       - name: Install Dependencies
         run: npm ci
@@ -41,7 +41,7 @@ jobs:
       - name: Install NodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: 18.12.1
+          node-version: 18.15.0
       
       - name: Install Dependencies
         run: npm ci
@@ -52,6 +52,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: test
+    outputs:
+      script-file: ${{ steps.publish_step.outputs.script-file }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -59,7 +61,7 @@ jobs:
       - name: Install NodeJS
         uses: actions/setup-node@v3
         with:
-          node-version: 18.12.1
+          node-version: 18.15.0
     
       - name: Install Dependencies
         run: npm ci 
@@ -67,7 +69,18 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Publish JS filename
+        id: publish_step
+        run: find dist/assets/*.js -type f -execdir echo 'script-file={}' >> $GITHUB_OUTPUT ';'
+
       - uses: actions/upload-artifact@v3
         with:
           name: github-pages
           path: './dist'
+
+  display-output:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Display Output JS Filename
+        run: echo "${{ needs.build.outputs.script-file }}"
